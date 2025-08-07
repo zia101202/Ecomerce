@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '@/store/auth';
 import { useToast } from '@/hooks/use-toast';
@@ -39,6 +40,10 @@ export default function ProductForm() {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingProduct, setIsLoadingProduct] = useState(isEdit);
+  const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryDescription, setNewCategoryDescription] = useState('');
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
 
   const {
     register,
@@ -121,6 +126,48 @@ export default function ProductForm() {
   const removeImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
     setImageFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const createCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    
+    setIsCreatingCategory(true);
+    
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .insert({
+          name: newCategoryName.trim(),
+          description: newCategoryDescription.trim() || null,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Add new category to the list and select it
+      setCategories(prev => [...prev, data]);
+      setValue('category_id', data.id);
+      
+      // Reset form and close dialog
+      setNewCategoryName('');
+      setNewCategoryDescription('');
+      setIsCreateCategoryOpen(false);
+
+      toast({
+        title: 'Success',
+        description: 'Category created successfully.',
+      });
+    } catch (error) {
+      console.error('Error creating category:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create category. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsCreatingCategory(false);
+    }
   };
 
   const onSubmit = async (data: ProductFormData) => {
@@ -290,7 +337,62 @@ export default function ProductForm() {
               {/* Category and Inventory */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label>Category</Label>
+                  <div className="flex items-center justify-between">
+                    <Label>Category</Label>
+                    <Dialog open={isCreateCategoryOpen} onOpenChange={setIsCreateCategoryOpen}>
+                      <DialogTrigger asChild>
+                        <Button type="button" variant="outline" size="sm">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Category
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Create New Category</DialogTitle>
+                          <DialogDescription>
+                            Add a new category for your products.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="category-name">Category Name *</Label>
+                            <Input
+                              id="category-name"
+                              value={newCategoryName}
+                              onChange={(e) => setNewCategoryName(e.target.value)}
+                              placeholder="Enter category name"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="category-description">Description</Label>
+                            <Textarea
+                              id="category-description"
+                              value={newCategoryDescription}
+                              onChange={(e) => setNewCategoryDescription(e.target.value)}
+                              placeholder="Enter category description"
+                              rows={3}
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setIsCreateCategoryOpen(false)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={createCategory}
+                            disabled={!newCategoryName.trim() || isCreatingCategory}
+                          >
+                            {isCreatingCategory ? 'Creating...' : 'Create Category'}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                   <Select
                     value={watch('category_id') || ''}
                     onValueChange={(value) => setValue('category_id', value)}

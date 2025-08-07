@@ -9,7 +9,10 @@ import {
   Plus,
   Eye,
   Edit,
-  Trash2 
+  Trash2,
+  Image,
+  Palette,
+  Mail
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -219,7 +222,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <Link to="/admin/products">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader>
@@ -248,6 +251,20 @@ export default function AdminDashboard() {
           </Card>
         </Link>
 
+        <Link to="/admin/messages">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Mail className="w-5 h-5 mr-2" />
+                Contact Messages
+              </CardTitle>
+              <CardDescription>
+                View and respond to customer inquiries
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
         <Link to="/admin/categories">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader>
@@ -257,6 +274,34 @@ export default function AdminDashboard() {
               </CardTitle>
               <CardDescription>
                 Organize products with categories
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link to="/admin/hero">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Image className="w-5 h-5 mr-2" />
+                Hero Section
+              </CardTitle>
+              <CardDescription>
+                Customize homepage hero content and images
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link to="/admin/themes">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Palette className="w-5 h-5 mr-2" />
+                Theme Manager
+              </CardTitle>
+              <CardDescription>
+                Customize website colors and appearance
               </CardDescription>
             </CardHeader>
           </Card>
