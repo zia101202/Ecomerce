@@ -12,7 +12,8 @@ import {
   Trash2,
   Image,
   Palette,
-  Mail
+  Mail,
+  Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -292,6 +293,20 @@ export default function AdminDashboard() {
             </CardHeader>
           </Card>
         </Link>
+        
+        <Link to="/admin/HomeCategories">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Image className="w-5 h-5 mr-2" />
+              Home Categoris
+              </CardTitle>
+              <CardDescription>
+                Add Categories in Home
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
 
         <Link to="/admin/themes">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
@@ -302,6 +317,20 @@ export default function AdminDashboard() {
               </CardTitle>
               <CardDescription>
                 Customize website colors and appearance
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link to="/admin/settings">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Settings className="w-5 h-5 mr-2" />
+                Site Settings
+              </CardTitle>
+              <CardDescription>
+                Manage store branding and site configuration
               </CardDescription>
             </CardHeader>
           </Card>

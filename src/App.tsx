@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme as useSupabaseTheme } from "@/hooks/useTheme";
 import { Navbar } from "@/components/Layout/Navbar";
 import { Footer } from "@/components/Layout/Footer";
 import Index from "./pages/Index";
@@ -26,12 +26,23 @@ import AdminCategories from "./pages/Admin/Categories";
 import AdminMessages from "./pages/Admin/Messages";
 import HeroContent from "./pages/Admin/HeroContent";
 import AdminThemes from "./pages/Admin/Themes";
+import SiteSettings from "./pages/Admin/SiteSettings";
+import HomeCategoriesManager from "./pages/Admin/HomeCategories";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 function AppContent() {
-  useTheme(); // Initialize theme system
+  const { loading } = useSupabaseTheme(); // Initialize Supabase theme system
+  
+  // Don't render until theme is loaded to prevent flash of unstyled content
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -58,6 +69,11 @@ function AppContent() {
           <Route path="/admin/messages" element={<AdminMessages />} />
           <Route path="/admin/hero" element={<HeroContent />} />
           <Route path="/admin/themes" element={<AdminThemes />} />
+          <Route path="/admin/settings" element={<SiteSettings />} />
+
+          <Route path="/admin/HomeCategories" element={<HomeCategoriesManager />} />
+          
+          {/* Catch-all route for 404 Not Found */}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -11,6 +11,7 @@ interface AuthState {
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   checkIsAdmin: () => Promise<void>;
+  hasRole: (role: string) => boolean;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -63,6 +64,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .maybeSingle();
 
     set({ isAdmin: !!data });
+  },
+
+  hasRole: (role: string) => {
+    const { isAdmin } = get();
+    return role === 'admin' ? isAdmin : false;
   },
 }));
 

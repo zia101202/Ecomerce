@@ -46,10 +46,13 @@ export function useTheme() {
     const isDark = root.classList.contains('dark');
     const colors = isDark ? theme.dark_colors : theme.light_colors;
 
-    // Apply CSS custom properties
+    // Apply CSS custom properties with HSL values and important flag
     Object.entries(colors).forEach(([key, value]) => {
-      root.style.setProperty(`--${key}`, String(value));
+      root.style.setProperty(`--${key}`, String(value), 'important');
     });
+    
+    // Add a data attribute to indicate custom theme is active
+    root.setAttribute('data-custom-theme', theme.name);
   };
 
   // Listen for theme changes from other tabs/windows

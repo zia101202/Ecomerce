@@ -23,6 +23,7 @@ import { useProductsStore } from '@/store/products';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 interface Category {
   id: string;
@@ -37,6 +38,7 @@ export const Navbar = () => {
   const { getTotalItems } = useCartStore();
   const { setFilters } = useProductsStore();
   const [categories, setCategories] = useState<Category[]>([]);
+  const { settings: siteSettings } = useSiteSettings();
 
   useEffect(() => {
     loadCategories();
@@ -76,10 +78,22 @@ export const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold">E</span>
-            </div>
-            <span className="font-bold text-xl">ECommerce</span>
+            {siteSettings?.logo_url ? (
+              <img 
+                src={siteSettings.logo_url} 
+                alt={siteSettings.store_name}
+                className="h-8 w-8 object-contain"
+              />
+            ) : (
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold">
+                  {siteSettings?.store_name?.[0] || 'E'}
+                </span>
+              </div>
+            )}
+            <span className="font-bold text-xl">
+              {siteSettings?.store_name || 'ECommerce'}
+            </span>
           </Link>
 
           {/* Navigation Menu */}
