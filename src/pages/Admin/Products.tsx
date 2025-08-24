@@ -330,10 +330,10 @@ export default function AdminProducts() {
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
-                          <span className="font-medium">${product.price}</span>
+                          <span className="font-medium">{product.price}RS</span>
                           {product.compare_price && product.compare_price > product.price && (
                             <span className="text-sm text-muted-foreground line-through">
-                              ${product.compare_price}
+                              {product.compare_price}RS
                             </span>
                           )}
                         </div>

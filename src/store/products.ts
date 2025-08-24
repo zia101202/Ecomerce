@@ -72,7 +72,7 @@ export const useProductsStore = create<ProductsState>((set, get) => ({
       .from('categories')
       .select('*')
       .order('name');
-
+console.log(data);
     if (!error && data) {
       set({ categories: data });
     }

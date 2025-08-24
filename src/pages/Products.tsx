@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Heart, ShoppingCart, Filter, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -33,15 +33,29 @@ export default function Products() {
   const { addItem } = useCartStore();
   const { user } = useAuthStore();
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [localSearchQuery, setLocalSearchQuery] = useState(filters.searchQuery || '');
   const [productReviews, setProductReviews] = useState<{[key: string]: {average: number, count: number}}>({});
+  const [currentCategory, setCurrentCategory] = useState<string | null>(null);
 
   useEffect(() => {
     loadProducts();
     loadCategories();
   }, []);
+
+  // Handle URL category parameter
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      setCurrentCategory(categoryParam);
+      setFilters({ category: categoryParam });
+    } else {
+      setCurrentCategory(null);
+      setFilters({ category: undefined });
+    }
+  }, [searchParams, setFilters]);
 
   // Load reviews for all products
   useEffect(() => {
@@ -88,6 +102,13 @@ export default function Products() {
 
   const filteredProducts = getFilteredProducts();
 
+  // Get current category name for display
+  const getCurrentCategoryName = () => {
+    if (!currentCategory) return null;
+    const category = categories.find(cat => cat.id === currentCategory);
+    return category ? category.name : null;
+  };
+
   const handleAddToCart = async (productId: string) => {
     if (!user) {
       toast({
@@ -117,66 +138,108 @@ export default function Products() {
     setFilters({ searchQuery: localSearchQuery });
   };
 
+  const handleCategoryChange = (categoryId: string) => {
+    if (categoryId === 'all') {
+      // Remove category from URL and filters
+      setSearchParams(prev => {
+        const newParams = new URLSearchParams(prev);
+        newParams.delete('category');
+        return newParams;
+      });
+      setCurrentCategory(null);
+      setFilters({ category: undefined });
+    } else {
+      // Add category to URL and filters
+      setSearchParams(prev => {
+        const newParams = new URLSearchParams(prev);
+        newParams.set('category', categoryId);
+        return newParams;
+      });
+      setCurrentCategory(categoryId);
+      setFilters({ category: categoryId });
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar Filters */}
-        <div className="w-full lg:w-64 space-y-6">
-          <div className="lg:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="w-full">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Filters
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-80">
-                <SheetHeader>
-                  <SheetTitle>Filters</SheetTitle>
-                  <SheetDescription>
-                    Filter products by category, price, and more.
-                  </SheetDescription>
-                </SheetHeader>
-                <FiltersContent 
-                  categories={categories}
-                  filters={filters}
-                  priceRange={priceRange}
-                  localSearchQuery={localSearchQuery}
-                  setLocalSearchQuery={setLocalSearchQuery}
-                  setFilters={setFilters}
-                  handlePriceRangeChange={handlePriceRangeChange}
-                  handleSearch={handleSearch}
-                />
-              </SheetContent>
-            </Sheet>
-          </div>
-
-          <div className="hidden lg:block">
-            <FiltersContent 
-              categories={categories}
-              filters={filters}
-              priceRange={priceRange}
-              localSearchQuery={localSearchQuery}
-              setLocalSearchQuery={setLocalSearchQuery}
-              setFilters={setFilters}
-              handlePriceRangeChange={handlePriceRangeChange}
-              handleSearch={handleSearch}
-            />
-          </div>
-        </div>
+        
 
         {/* Products Grid */}
         <div className="flex-1">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Products ({filteredProducts.length})</h1>
+          {/* Filters Row - Category and Price Range */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            {/* Categories */}
+            <div className="flex-1">
+              <Label className="text-sm font-medium mb-2 block">Category</Label>
+              <Select
+                value={currentCategory || 'all'}
+                onValueChange={handleCategoryChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category: any) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Price Range */}
+            <div className="flex-1">
+              <Label className="text-sm font-medium mb-2 block">Price Range</Label>
+              <div className="space-y-3">
+                <Slider
+                  value={priceRange}
+                  onValueChange={handlePriceRangeChange}
+                  min={0}
+                  max={1000}
+                  step={10}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>{priceRange[0]} Rs</span>
+                  <span>{priceRange[1]} Rs</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Header with title and sort */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold">
+                {getCurrentCategoryName() ? `${getCurrentCategoryName()} Products` : 'All Products'} 
+                <span className="text-muted-foreground ml-2">({filteredProducts.length})</span>
+              </h1>
+              {getCurrentCategoryName() && (
+                <div className="flex items-center gap-2 mt-2">
+                  <Badge variant="secondary" className="text-xs">{getCurrentCategoryName()}</Badge>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleCategoryChange('all')}
+                    className="text-xs h-6"
+                  >
+                    Clear filter
+                  </Button>
+                </div>
+              )}
+            </div>
             
-            <div className="flex items-center gap-4">
-              <Label htmlFor="sort">Sort by:</Label>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Label htmlFor="sort" className="text-sm">Sort by:</Label>
               <Select value={`${sortBy}-${sortOrder}`} onValueChange={(value) => {
                 const [field, order] = value.split('-');
                 setSorting(field, order as 'asc' | 'desc');
               }}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-full sm:w-48">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -206,7 +269,21 @@ export default function Products() {
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No products found matching your criteria.</p>
+              <p className="text-muted-foreground">
+                {getCurrentCategoryName() 
+                  ? `No products found in the ${getCurrentCategoryName()} category.`
+                  : 'No products found matching your criteria.'
+                }
+              </p>
+              {getCurrentCategoryName() && (
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => handleCategoryChange('all')}
+                >
+                  View All Products
+                </Button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -275,10 +352,10 @@ export default function Products() {
 
                     <div className="flex items-center justify-between mt-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold">${product.price}</span>
+                        <span className="text-lg font-bold">{product.price} Rs</span>
                         {product.compare_price && product.compare_price > product.price && (
                           <span className="text-sm text-muted-foreground line-through">
-                            ${product.compare_price}
+                            {product.compare_price} Rs
                           </span>
                         )}
                       </div>
@@ -322,66 +399,16 @@ const FiltersContent = ({
   filters,
   priceRange,
   localSearchQuery,
+  currentCategory,
   setLocalSearchQuery,
   setFilters,
   handlePriceRangeChange,
   handleSearch,
+  handleCategoryChange,
 }: any) => (
   <div className="space-y-6">
-    {/* Search */}
-    <div className="space-y-2">
-      <Label>Search</Label>
-      <div className="flex gap-2">
-        <Input
-          placeholder="Search products..."
-          value={localSearchQuery}
-          onChange={(e) => setLocalSearchQuery(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-        />
-        <Button onClick={handleSearch} size="sm">
-          Search
-        </Button>
-      </div>
-    </div>
 
-    {/* Categories */}
-    <div className="space-y-2">
-      <Label>Category</Label>
-      <Select
-        value={filters.category || 'all'}
-        onValueChange={(value) => setFilters({ category: value === 'all' ? undefined : value })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="All categories" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Categories</SelectItem>
-          {categories.map((category: any) => (
-            <SelectItem key={category.id} value={category.id}>
-              {category.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
 
-    {/* Price Range */}
-    <div className="space-y-4">
-      <Label>Price Range</Label>
-      <div className="px-2">
-        <Slider
-          value={priceRange}
-          onValueChange={handlePriceRangeChange}
-          min={0}
-          max={1000}
-          step={10}
-          className="w-full"
-        />
-      </div>
-      <div className="flex justify-between text-sm text-muted-foreground">
-        <span>${priceRange[0]}</span>
-        <span>${priceRange[1]}</span>
-      </div>
-    </div>
+
   </div>
 );

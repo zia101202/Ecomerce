@@ -240,22 +240,22 @@ export const Checkout = () => {
                     <p className="font-medium">{item.product.name}</p>
                     <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                   </div>
-                  <p className="font-medium">₹{(item.product.price * item.quantity).toFixed(2)}</p>
+                  <p className="font-medium">{(item.product.price * item.quantity).toFixed(2)} Rs</p>
                 </div>
               ))}
               
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>₹{subtotal.toFixed(2)}</span>
+                  <span>{subtotal.toFixed(2)} Rs</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Delivery Fee</span>
-                  <span>₹{deliveryFee.toFixed(2)}</span>
+                  <span>{deliveryFee.toFixed(2)} Rs</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg border-t pt-2">
                   <span>Total</span>
-                  <span>₹{(subtotal + deliveryFee).toFixed(2)}</span>
+                  <span>{(subtotal + deliveryFee).toFixed(2)} Rs</span>
                 </div>
               </div>
             </CardContent>
@@ -412,15 +412,15 @@ export const Checkout = () => {
                           >
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="standard" id="standard" />
-                              <Label htmlFor="standard">Standard Delivery (5-7 days) - ₹50</Label>
+                              <Label htmlFor="standard">Standard Delivery (5-7 days) - 50 Rs</Label>
                             </div>
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="express" id="express" />
-                              <Label htmlFor="express">Express Delivery (2-3 days) - ₹100</Label>
+                              <Label htmlFor="express">Express Delivery (2-3 days) - 100 Rs</Label>
                             </div>
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="overnight" id="overnight" />
-                              <Label htmlFor="overnight">Overnight Delivery (1 day) - ₹200</Label>
+                              <Label htmlFor="overnight">Overnight Delivery (1 day) - 200 Rs</Label>
                             </div>
                           </RadioGroup>
                         </FormControl>
@@ -476,7 +476,7 @@ export const Checkout = () => {
 
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Place Order - ₹{(subtotal + deliveryFee).toFixed(2)}
+                    Place Order - {(subtotal + deliveryFee).toFixed(2)} Rs
                   </Button>
                 </form>
               </Form>

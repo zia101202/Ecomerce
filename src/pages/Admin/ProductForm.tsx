@@ -310,12 +310,12 @@ export default function ProductForm() {
                   <Input
                     id="price"
                     type="number"
-                    step="0.01"
+                    step="0"
                     {...register('price', { 
                       required: 'Price is required',
                       min: { value: 0, message: 'Price must be positive' }
                     })}
-                    placeholder="0.00"
+                    placeholder="0"
                   />
                   {errors.price && (
                     <p className="text-sm text-destructive">{errors.price.message}</p>
@@ -327,9 +327,9 @@ export default function ProductForm() {
                   <Input
                     id="compare_price"
                     type="number"
-                    step="0.01"
+                    step="0"
                     {...register('compare_price')}
-                    placeholder="0.00"
+                    placeholder="0"
                   />
                 </div>
               </div>

@@ -51,6 +51,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   checkIsAdmin: async () => {
     const { user } = get();
+    console.log('Checking if user is admin:', user);
     if (!user) {
       set({ isAdmin: false });
       return;
@@ -62,7 +63,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .eq('user_id', user.id)
       .eq('role', 'admin')
       .maybeSingle();
-
+console.log(data, 'Data from user_roles check');
     set({ isAdmin: !!data });
   },
 

@@ -228,7 +228,7 @@ export const Orders = () => {
                         {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                       </span>
                     </Badge>
-                    <p className="text-lg font-semibold">₹{order.total_amount.toFixed(2)}</p>
+                    <p className="text-lg font-semibold">{order.total_amount.toFixed(2)} Rs</p>
                   </div>
                 </div>
               </CardHeader>
@@ -250,12 +250,12 @@ export const Orders = () => {
                             <div>
                               <p className="font-medium">{item.product.name}</p>
                               <p className="text-sm text-muted-foreground">
-                                Quantity: {item.quantity} × ₹{item.price.toFixed(2)}
+                                Quantity: {item.quantity} × {item.price.toFixed(2)} Rs
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <p className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
+                            <p className="font-semibold">{(item.price * item.quantity).toFixed(2)} Rs</p>
                             {order.status === 'delivered' && !hasReviewed(item.product.id) && (
                               <Button
                                 size="sm"

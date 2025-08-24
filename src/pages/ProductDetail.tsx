@@ -421,10 +421,10 @@ export default function ProductDetail() {
             </div>
 
             <div className="flex items-center gap-4 mb-6">
-              <span className="text-3xl font-bold">₹{product.price}</span>
+              <span className="text-3xl font-bold">{product.price} Rs</span>
               {product.compare_price && product.compare_price > product.price && (
                 <span className="text-xl text-muted-foreground line-through">
-                  ₹{product.compare_price}
+                  {product.compare_price} Rs
                 </span>
               )}
             </div>
@@ -511,7 +511,7 @@ export default function ProductDetail() {
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm">
               <Truck className="w-4 h-4 text-primary" />
-              <span>Free shipping on orders over ₹500</span>
+              <span>Free shipping on orders over 500 Rs</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <Shield className="w-4 h-4 text-primary" />
